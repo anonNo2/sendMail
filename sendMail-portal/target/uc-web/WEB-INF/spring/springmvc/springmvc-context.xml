@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		">
+    <!-- Enables the Spring MVC @Controller programming model -->
+    <mvc:annotation-driven/>
+
+
+
+    <!-- register DefaultAnnotationHandlerMapping and AnnotationMethodHandlerAdapter instance <mvc:annotation-driven /> -->
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <ref bean="fastJsonHttpMessageConverter"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/views/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!-- this config must be last -->
+    <mvc:default-servlet-handler/>
+
+
+    <context:component-scan base-package="org.anon.controller"><!-- base-package 如果多个，用“,”分隔 -->
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+        <context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice" />
+    </context:component-scan>
+    <context:component-scan base-package="org.anon.framework.exceptionResolver" /><!-- base-package 如果多个，用“,”分隔 -->
+    <context:component-scan base-package="org.anon.service" />
+    <context:annotation-config/>
+
+    <!-- 处理JSON数据转换的 -->
+    <bean id="fastJsonHttpMessageConverter"
+          class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+        <!-- 为了处理返回的JSON数据的编码，默认是ISO-88859-1的，这里把它设置为utf-8,解决有乱码的情况 -->
+        <property name="supportedMediaTypes">
+            <list>
+                <value>application/json;charset=UTF-8</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+
+
+
+
+</beans>
